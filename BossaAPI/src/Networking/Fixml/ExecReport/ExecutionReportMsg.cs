@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Xml;
+using pjank.BossaAPI.DTO;
 
 namespace pjank.BossaAPI.Fixml
 {
@@ -113,6 +114,100 @@ namespace pjank.BossaAPI.Fixml
 					case OrdCommissionType.Absolute: return Commission;
 					default: return null;
 				}
+			}
+		}
+
+		public OrderData GetOrderDate()
+        {
+			var order = new OrderData();
+			order.AccountNumber = Account;
+			order.BrokerId = BrokerOrderId2;
+			order.ClientId = ClientOrderId;
+
+			// UWAGA: odczyt danych z komunikatu ExecRpt odbywa się "na czuja"... bo dostarczoną 
+			// z Bossy/Comarchu dokumentacją na ten temat to można sobie najwyżej w kominku podpalić.
+			// Generalnie wszystko jest rozjechane, ale te statusy zleceń to już chyba po pijaku pisali.
+			//   Tyle - musiałem to tu napisać !!!  ;-P
+			// Bo mnie już krew zalewa, jak widzę co ten NOL3 wysyła i gdzie (w których polach)... 
+			// I że w ogóle musiałem te wszystkie możliwe przypadki samodzielnie analizować...
+			// A jak za miesiąc przestanie działać, bo coś tam "naprawią", to chyba kogoś postrzelę ;-(
+
+
+			// raport o wykonaniu - być może cząstkowym - danego zlecenia
+			// (z praktyki wynika, że zawsze wcześniej dostaniemy "pełen" ExecRpt z pozostałymi
+			// informacjami o tym zleceniu... dlatego teraz odbieramy sobie tylko raport z tej transakcji)
+			if (ExecType == ExecReportType.Trade)
+			{
+				order.TradeReport = new OrderTradeData();
+				order.TradeReport.Time = (DateTime)TransactionTime;
+				order.TradeReport.Price = (decimal)Price;  // LastPrice !?
+				order.TradeReport.Quantity = (uint)Quantity;  // LastQuantity !?
+				order.TradeReport.NetValue = (decimal)NetMoney;
+				order.TradeReport.Commission = (decimal)CommissionValue;
+			}
+			else
+			{
+				// w pozostałych przypadkach wygląda na to, że lepiej się oprzeć na polu "Status"
+				// (bo ExecType czasem jest, czasem nie ma - różnie to z nim bywa... a Status jest chyba zawsze)
+				order.StatusReport = new OrderStatusData();
+				order.StatusReport.Status = ExecReport_GetStatus();
+				order.StatusReport.Quantity = (uint)CumulatedQuantity;
+				order.StatusReport.NetValue = (decimal)NetMoney;
+				order.StatusReport.Commission = (decimal)CommissionValue;  // czasem == 0, ale dlaczego!? kto to wie... 
+
+				// pozostałe dane - żeby się nie rozdrabniać - też aktualizujemy za każdym razem
+				// (teoretycznie wystarczyłoby przy "new" i "replace"... ale czasem jako pierwsze
+				// przychodzi np. "filled" i kto wie co jeszcze innego, więc tak będzie bezpieczniej)
+				order.MainData = new OrderMainData();
+				order.MainData.CreateTime = (DateTime)TransactionTime;
+				order.MainData.Instrument = Instrument.Convert();
+				order.MainData.Side = (Side == Fixml.OrderSide.Buy) ? BosOrderSide.Buy : BosOrderSide.Sell;
+				order.MainData.PriceType = ExecReport_GetPriceType();
+				if (order.MainData.PriceType == PriceType.Limit)
+					order.MainData.PriceLimit = Price;
+				if ((Type == OrderType.StopLimit) || (Type == OrderType.StopLoss))
+					order.MainData.ActivationPrice = StopPrice;
+				order.MainData.Quantity = (uint)Quantity;
+				order.MainData.MinimumQuantity = (TimeInForce == OrdTimeInForce.WuA) ? Quantity : MinimumQuantity;
+				order.MainData.VisibleQuantity = DisplayQuantity;
+				order.MainData.ImmediateOrCancel = (TimeInForce == OrdTimeInForce.WiA);
+				order.MainData.ExpirationDate = (TimeInForce == OrdTimeInForce.Date) ? ExpireDate : null;
+			}
+
+			return order;
+		}
+
+		// funkcja pomocnicza zamieniająca status zlecenia FIXML na nasz BosOrderStatus
+		private BosOrderStatus ExecReport_GetStatus()
+		{
+			switch (Status)
+			{
+				case ExecReportStatus.New: return BosOrderStatus.Active;
+				case ExecReportStatus.PartiallyFilled: return BosOrderStatus.ActiveFilled;
+				case ExecReportStatus.Canceled: return ((CumulatedQuantity ?? 0) > 0) ? BosOrderStatus.CancelledFilled : BosOrderStatus.Cancelled;
+				case ExecReportStatus.Filled: return BosOrderStatus.Filled;
+				case ExecReportStatus.Expired: return BosOrderStatus.Expired;
+				case ExecReportStatus.Rejected: return BosOrderStatus.Rejected;
+				case ExecReportStatus.PendingReplace: return BosOrderStatus.PendingReplace;
+				case ExecReportStatus.PendingCancel: return BosOrderStatus.PendingCancel;
+				default: throw new ArgumentException("Unknown ExecReport-Status");
+			}
+		}
+
+		// funkcja pomocnicza zamieniająca typ zlecenia FIXML na nasz DTO.PriceType
+		private PriceType ExecReport_GetPriceType()
+		{
+			switch (Type)
+			{
+				case OrderType.Limit:
+				case OrderType.StopLimit: return PriceType.Limit;
+				case OrderType.PKC:
+				case OrderType.StopLoss: return PriceType.PKC;
+				case OrderType.PCR_PCRO:
+					var time = TimeInForce;
+					var pcro = ((time == OrdTimeInForce.Opening) || (time == OrdTimeInForce.Closing));
+					return pcro ? PriceType.PCRO : PriceType.PCR;
+				default: throw new ArgumentException("Unknown ExecReport-OrderType");
 			}
 		}
 

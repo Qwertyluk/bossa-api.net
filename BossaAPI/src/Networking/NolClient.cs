@@ -712,7 +712,7 @@ namespace pjank.BossaAPI
 		#region Orders
 
 		// Metoda IBosClient do składania nowego zlecenia.
-		public string OrderCreate(OrderData data)
+		public OrderData OrderCreate(OrderData data)
 		{
 			string clientId;
 			Debug.WriteLine("\nOrderCreate...");
@@ -735,9 +735,10 @@ namespace pjank.BossaAPI
 				request.ExpireDate = data.MainData.ExpirationDate;
 				request.Send(socket);
 				ExecutionReportMsg response = new ExecutionReportMsg(socket);
+
+				Debug.WriteLine("OrderCreate OK\n");
+				return response.GetOrderDate();
 			}
-			Debug.WriteLine("OrderCreate OK\n");
-			return clientId;
 		}
 
 		// Metoda IBosClient do modyfikacji istniejącego zlecenia.
@@ -812,97 +813,8 @@ namespace pjank.BossaAPI
 		{
 			if (OrderUpdateEvent != null)
 			{
-				var order = new OrderData();
-				order.AccountNumber = msg.Account;
-				order.BrokerId = msg.BrokerOrderId2;
-				order.ClientId = msg.ClientOrderId;
-
-				// UWAGA: odczyt danych z komunikatu ExecRpt odbywa się "na czuja"... bo dostarczoną 
-				// z Bossy/Comarchu dokumentacją na ten temat to można sobie najwyżej w kominku podpalić.
-				// Generalnie wszystko jest rozjechane, ale te statusy zleceń to już chyba po pijaku pisali.
-				//   Tyle - musiałem to tu napisać !!!  ;-P
-				// Bo mnie już krew zalewa, jak widzę co ten NOL3 wysyła i gdzie (w których polach)... 
-				// I że w ogóle musiałem te wszystkie możliwe przypadki samodzielnie analizować...
-				// A jak za miesiąc przestanie działać, bo coś tam "naprawią", to chyba kogoś postrzelę ;-(
-
-
-				// raport o wykonaniu - być może cząstkowym - danego zlecenia
-				// (z praktyki wynika, że zawsze wcześniej dostaniemy "pełen" ExecRpt z pozostałymi
-				// informacjami o tym zleceniu... dlatego teraz odbieramy sobie tylko raport z tej transakcji)
-				if (msg.ExecType == ExecReportType.Trade)
-				{
-					order.TradeReport = new OrderTradeData();
-					order.TradeReport.Time = (DateTime)msg.TransactionTime;
-					order.TradeReport.Price = (decimal)msg.Price;  // LastPrice !?
-					order.TradeReport.Quantity = (uint)msg.Quantity;  // LastQuantity !?
-					order.TradeReport.NetValue = (decimal)msg.NetMoney;
-					order.TradeReport.Commission = (decimal)msg.CommissionValue;
-				}
-				else
-				{
-					// w pozostałych przypadkach wygląda na to, że lepiej się oprzeć na polu "Status"
-					// (bo ExecType czasem jest, czasem nie ma - różnie to z nim bywa... a Status jest chyba zawsze)
-					order.StatusReport = new OrderStatusData();
-					order.StatusReport.Status = ExecReport_GetStatus(msg);
-					order.StatusReport.Quantity = (uint)msg.CumulatedQuantity;
-					order.StatusReport.NetValue = (decimal)msg.NetMoney;
-					order.StatusReport.Commission = (decimal)msg.CommissionValue;  // czasem == 0, ale dlaczego!? kto to wie... 
-
-					// pozostałe dane - żeby się nie rozdrabniać - też aktualizujemy za każdym razem
-					// (teoretycznie wystarczyłoby przy "new" i "replace"... ale czasem jako pierwsze
-					// przychodzi np. "filled" i kto wie co jeszcze innego, więc tak będzie bezpieczniej)
-					order.MainData = new OrderMainData();
-					order.MainData.CreateTime = (DateTime)msg.TransactionTime;
-					order.MainData.Instrument = msg.Instrument.Convert();
-					order.MainData.Side = (msg.Side == Fixml.OrderSide.Buy) ? BosOrderSide.Buy : BosOrderSide.Sell;
-					order.MainData.PriceType = ExecReport_GetPriceType(msg);
-					if (order.MainData.PriceType == PriceType.Limit)
-						order.MainData.PriceLimit = msg.Price;
-					if ((msg.Type == OrderType.StopLimit) || (msg.Type == OrderType.StopLoss))
-						order.MainData.ActivationPrice = msg.StopPrice;
-					order.MainData.Quantity = (uint)msg.Quantity;
-					order.MainData.MinimumQuantity = (msg.TimeInForce == OrdTimeInForce.WuA) ? msg.Quantity : msg.MinimumQuantity;
-					order.MainData.VisibleQuantity = msg.DisplayQuantity;
-					order.MainData.ImmediateOrCancel = (msg.TimeInForce == OrdTimeInForce.WiA);
-					order.MainData.ExpirationDate = (msg.TimeInForce == OrdTimeInForce.Date) ? msg.ExpireDate : null;
-				}
-
 				// wywołanie zdarzenia z przygotowanymi danymi
-				OrderUpdateEvent(order);
-			}
-		}
-
-		// funkcja pomocnicza zamieniająca status zlecenia FIXML na nasz BosOrderStatus
-		private static BosOrderStatus ExecReport_GetStatus(ExecutionReportMsg msg)
-		{
-			switch (msg.Status)
-			{
-				case ExecReportStatus.New: return BosOrderStatus.Active;
-				case ExecReportStatus.PartiallyFilled: return BosOrderStatus.ActiveFilled;
-				case ExecReportStatus.Canceled: return ((msg.CumulatedQuantity ?? 0) > 0) ? BosOrderStatus.CancelledFilled : BosOrderStatus.Cancelled;
-				case ExecReportStatus.Filled: return BosOrderStatus.Filled;
-				case ExecReportStatus.Expired: return BosOrderStatus.Expired;
-				case ExecReportStatus.Rejected: return BosOrderStatus.Rejected;
-				case ExecReportStatus.PendingReplace: return BosOrderStatus.PendingReplace;
-				case ExecReportStatus.PendingCancel: return BosOrderStatus.PendingCancel;
-				default: throw new ArgumentException("Unknown ExecReport-Status");
-			}
-		}
-
-		// funkcja pomocnicza zamieniająca typ zlecenia FIXML na nasz DTO.PriceType
-		private static PriceType ExecReport_GetPriceType(ExecutionReportMsg msg)
-		{
-			switch (msg.Type)
-			{
-				case OrderType.Limit:
-				case OrderType.StopLimit: return PriceType.Limit;
-				case OrderType.PKC:
-				case OrderType.StopLoss: return PriceType.PKC;
-				case OrderType.PCR_PCRO:
-					var time = msg.TimeInForce;
-					var pcro = ((time == OrdTimeInForce.Opening) || (time == OrdTimeInForce.Closing));
-					return pcro ? PriceType.PCRO : PriceType.PCR;
-				default: throw new ArgumentException("Unknown ExecReport-OrderType");
+				OrderUpdateEvent(msg.GetOrderDate());
 			}
 		}
 

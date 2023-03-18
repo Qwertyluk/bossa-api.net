@@ -27,7 +27,7 @@ namespace pjank.BossaAPI
 		/// <param name="data">Obiekt z danymi nowego zlecenia.
 		/// Wypełnić należy: Nr rachunku i komplet informacji o zleceniu (MainData).</param>
 		/// <returns>Zwraca ClientId, jakie zostało przypisane przez bibliotekę do tego zlecenia.</returns>
-		string OrderCreate(OrderData data);
+		OrderData OrderCreate(OrderData data);
 		/// <summary>
 		/// Modyfikacja wcześniejszego zlecenia.
 		/// </summary>

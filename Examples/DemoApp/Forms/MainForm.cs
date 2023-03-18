@@ -161,7 +161,7 @@ namespace pjank.BossaAPI.DemoApp
 				if (price == null) return;
 				var quantity = InputForm.GetInt("Buy order Quantity", 1);
 				if (quantity == null) return;
-				if (price != null) instr.Buy(price, (uint)quantity);
+				if (price != null) instr.Buy(price, (uint)quantity, null);
 			}
 			catch (Exception ex)
 			{
@@ -178,7 +178,7 @@ namespace pjank.BossaAPI.DemoApp
 				if (price == null) return;
 				var quantity = InputForm.GetInt("Sell order Quantity", 1);
 				if (quantity == null) return;
-				if (price != null) instr.Sell(price, (uint)quantity);
+				if (price != null) instr.Sell(price, (uint)quantity, null);
 			}
 			catch (Exception ex)
 			{

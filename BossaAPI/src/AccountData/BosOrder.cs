@@ -236,7 +236,7 @@ namespace pjank.BossaAPI
 		/// <param name="immediateOrCancel">Czy to zlecenie typu "WiA" (to, co nie wykona się natychmiast, jest od razu anulowane).</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static void Create(BosAccount account, BosInstrument instrument, 
+		public static BosOrder Create(BosAccount account, BosInstrument instrument, 
 			BosOrderSide side, BosPrice price, decimal? activationPrice,
 			uint quantity, uint? minimumQuantity, uint? visibleQuantity, bool immediateOrCancel, DateTime? expirationDate, DateTime? tradeDate)
 		{
@@ -255,9 +255,8 @@ namespace pjank.BossaAPI
 			data.MainData.ImmediateOrCancel = immediateOrCancel;
 			data.MainData.ExpirationDate = expirationDate;
 			data.MainData.TradeDate = tradeDate;
-			account.api.Connection.OrderCreate(data);
-			// TODO: Zastanawiam się jeszczcze m.in. co z ClientId, TradeDate... i czy w ogóle byłby sens
-			// od razu tworzyć taki nowy obiekt BosOrder (zamiast zaczekać aż sam się doda przy OrderUpdate).
+			var orderData = account.api.Connection.OrderCreate(data);
+			return new BosOrder(account, orderData);
 		}
 
 		/// <summary>
@@ -277,12 +276,12 @@ namespace pjank.BossaAPI
 		/// <param name="immediateOrCancel">Czy to zlecenie typu "WiA" (to, co nie wykona się natychmiast, jest od razu anulowane).</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static void Create(BosInstrument instrument,
+		public static BosOrder Create(BosInstrument instrument,
 			BosOrderSide side, BosPrice price, decimal? activationPrice,
 			uint quantity, uint? minimumQuantity, uint? visibleQuantity, bool immediateOrCancel, DateTime? expirationDate, DateTime? tradeDate)
 		{
 			var account = Bossa.Accounts[instrument.Type];
-			Create(account, instrument, side, price, activationPrice,
+			return Create(account, instrument, side, price, activationPrice,
 				quantity, minimumQuantity, visibleQuantity, immediateOrCancel, expirationDate, tradeDate);
 		}
 
@@ -299,10 +298,10 @@ namespace pjank.BossaAPI
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić/sprzedać.</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static void Create(BosInstrument instrument,
+		public static BosOrder Create(BosInstrument instrument,
 			BosOrderSide side, BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
 		{
-			Create(instrument, side, price, activationPrice, quantity, null, null, false, expirationDate, tradeDate);
+			return Create(instrument, side, price, activationPrice, quantity, null, null, false, expirationDate, tradeDate);
 		}
 
 		/// <summary>
@@ -317,9 +316,9 @@ namespace pjank.BossaAPI
 		/// <param name="activationPrice">Ewentualny limit aktywacji zlecenia (null, jeśli aktywowane od razu, bez stop'a).</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić/sprzedać.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static void Create(BosInstrument instrument, BosOrderSide side, BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
+		public static BosOrder Create(BosInstrument instrument, BosOrderSide side, BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
 		{
-			Create(instrument, side, price, activationPrice, quantity, null, null, false, null, tradeDate);
+			return Create(instrument, side, price, activationPrice, quantity, null, null, false, null, tradeDate);
 		}
 
 		/// <summary>
@@ -333,9 +332,9 @@ namespace pjank.BossaAPI
 		/// <param name="price">Limit ceny, jaki wstawiamy do zlecenia (BosPrice.PKC/PCR/PCRO... lub po prostu kwota).</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić/sprzedać.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static void Create(BosInstrument instrument, BosOrderSide side, BosPrice price, uint quantity, DateTime? tradeDate)
+		public static BosOrder Create(BosInstrument instrument, BosOrderSide side, BosPrice price, uint quantity, DateTime? tradeDate)
 		{
-			Create(instrument, side, price, null, quantity, null, null, false, null, tradeDate);
+			return Create(instrument, side, price, null, quantity, null, null, false, null, tradeDate);
 		}
 
 		#endregion

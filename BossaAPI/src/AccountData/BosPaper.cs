@@ -63,9 +63,9 @@ namespace pjank.BossaAPI
 		public void Release(BosPrice price)
 		{
 			if (Quantity110 > 0)
-				Instrument.Sell(price, (uint)Quantity110);
+				Instrument.Sell(price, (uint)Quantity110, null);
 			else
-				Instrument.Buy(price, (uint)-Quantity110);
+				Instrument.Buy(price, (uint)-Quantity110, null);
 		}
 
 		#endregion

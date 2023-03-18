@@ -182,10 +182,10 @@ namespace pjank.BossaAPI
 		/// <param name="immediateOrCancel">Czy to zlecenie typu "WiA" (to, co nie wykona się natychmiast, jest od razu anulowane).</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Order(BosOrderSide side, BosPrice price, decimal? activationPrice,
+		public BosOrder Order(BosOrderSide side, BosPrice price, decimal? activationPrice,
 			uint quantity, uint? minimumQuantity, uint? visibleQuantity, bool immediateOrCancel, DateTime? expirationDate, DateTime? tradeDate)
 		{
-			BosOrder.Create(this, side, price, activationPrice,
+			return BosOrder.Create(this, side, price, activationPrice,
 				quantity, minimumQuantity, visibleQuantity, immediateOrCancel, expirationDate, tradeDate);
 		}
 
@@ -200,9 +200,9 @@ namespace pjank.BossaAPI
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić/sprzedać.</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Order(BosOrderSide side, BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
+		public BosOrder Order(BosOrderSide side, BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
 		{
-			Order(side, price, activationPrice, quantity, null, null, false, expirationDate, tradeDate);
+			return Order(side, price, activationPrice, quantity, null, null, false, expirationDate, tradeDate);
 		}
 
 		/// <summary>
@@ -213,9 +213,9 @@ namespace pjank.BossaAPI
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić.</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Buy(BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
+		public BosOrder Buy(BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
 		{
-			Order(BosOrderSide.Buy, price, activationPrice, quantity, expirationDate, tradeDate);
+			return Order(BosOrderSide.Buy, price, activationPrice, quantity, expirationDate, tradeDate);
 		}
 
 		/// <summary>
@@ -226,9 +226,9 @@ namespace pjank.BossaAPI
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy sprzedać.</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Sell(BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
+		public BosOrder Sell(BosPrice price, decimal? activationPrice, uint quantity, DateTime? expirationDate, DateTime? tradeDate)
 		{
-			Order(BosOrderSide.Sell, price, activationPrice, quantity, expirationDate, tradeDate);
+			return Order(BosOrderSide.Sell, price, activationPrice, quantity, expirationDate, tradeDate);
 		}
 
 		/// <summary>
@@ -238,9 +238,9 @@ namespace pjank.BossaAPI
 		/// <param name="activationPrice">Ewentualny limit aktywacji (null, jeśli bez stop'a).</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Buy(BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
+		public BosOrder Buy(BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
 		{
-			Buy(price, activationPrice, quantity, null, tradeDate);
+			return Buy(price, activationPrice, quantity, null, tradeDate);
 		}
 
 		/// <summary>
@@ -250,9 +250,9 @@ namespace pjank.BossaAPI
 		/// <param name="activationPrice">Ewentualny limit aktywacji (null, jeśli bez stop'a).</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy sprzedać.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Sell(BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
+		public BosOrder Sell(BosPrice price, decimal? activationPrice, uint quantity, DateTime? tradeDate)
 		{
-			Sell(price, activationPrice, quantity, tradeDate);
+			return Sell(price, activationPrice, quantity, tradeDate);
 		}
 
 		/// <summary>
@@ -261,9 +261,9 @@ namespace pjank.BossaAPI
 		/// <param name="price">Limit ceny: BosPrice.PKC/PCR/PCRO... lub po prostu kwota.</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy kupić.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Buy(BosPrice price, uint quantity, DateTime? tradeDate)
+		public BosOrder Buy(BosPrice price, uint quantity, DateTime? tradeDate)
 		{
-			Buy(price, null, quantity, tradeDate);
+			return Buy(price, null, quantity, tradeDate);
 		}
 
 		/// <summary>
@@ -272,9 +272,9 @@ namespace pjank.BossaAPI
 		/// <param name="price">Limit ceny: BosPrice.PKC/PCR/PCRO... lub po prostu kwota.</param>
 		/// <param name="quantity">Liczba walorów, jaką zamierzamy sprzedać.</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public void Sell(BosPrice price, uint quantity, DateTime? tradeDate)
+		public BosOrder Sell(BosPrice price, uint quantity, DateTime? tradeDate)
 		{
-			Sell(price, null, quantity, tradeDate);
+			return Sell(price, null, quantity, tradeDate);
 		}
 
 		#endregion
