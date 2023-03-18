@@ -16,11 +16,15 @@ namespace pjank.BossaAPI.src
 		/// </summary>
 		public BosAccounts Accounts => Bossa.Accounts;
 
+		public BosAccount GetAccount(string number) => Bossa.Accounts[number];
+
 		/// <summary>
 		/// Dostęp do informacji o notowaniach poszczególnych instrumentów na rynku
 		/// (historia ostatnich transakcji, bieżąca tabela ofert kupna/sprzedaży).
 		/// </summary>
 		public BosInstruments Instruments => Bossa.Instruments;
+
+		public BosInstrument GetInstrument(string symbol) => Bossa.Instruments[symbol];
 
 		/// <summary>
 		/// Zdarzenie wywoływane po każdej aktualizacji danych.

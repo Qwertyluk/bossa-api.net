@@ -266,6 +266,11 @@ namespace pjank.BossaAPI
 			return Buy(price, null, quantity, tradeDate);
 		}
 
+		public BosOrder Buy(double price, int quantity)
+        {
+			return Buy((decimal)price, (uint)quantity, new DateTime(2023, 3, 20));
+        }
+
 		/// <summary>
 		/// Wysłanie do systemu nowego zlecenia na sprzedaż bieżącego instrumentu.
 		/// </summary>
