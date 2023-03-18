@@ -23,5 +23,6 @@ namespace pjank.BossaAPI.DTO
 		public uint? VisibleQuantity;
 		public bool ImmediateOrCancel;
 		public DateTime? ExpirationDate;
+		public DateTime? TradeDate;
 	}
 }

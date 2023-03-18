@@ -32,7 +32,6 @@ namespace pjank.BossaAPI.Fixml
 		public NewOrderSingleMsg()
 		{
 			ClientOrderId = (++nextId).ToString();
-			TradeDate = DateTime.Now;
 			CreateTime = DateTime.Now;
 			Type = OrderType.Limit;
 			Currency = "PLN";

@@ -721,6 +721,7 @@ namespace pjank.BossaAPI
 				NewOrderSingleMsg request = new NewOrderSingleMsg();
 				clientId = request.ClientOrderId;  // automatycznie przydzielone kolejne Id
 				request.Account = data.AccountNumber;
+				request.TradeDate = data.MainData.TradeDate ?? DateTime.Now;
 				request.CreateTime = data.MainData.CreateTime;
 				request.Instrument = FixmlInstrument.Find(data.MainData.Instrument);
 				request.Side = (data.MainData.Side == BosOrderSide.Buy) ? OrderSide.Buy : OrderSide.Sell;
