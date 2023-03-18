@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BossaAPI", "BossaAPI\BossaAPI.csproj", "{4F4C0B7B-A55B-4189-8127-AA79A32AAE5B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp", "Examples\DemoApp\DemoApp.csproj", "{92E9ADDB-0517-4842-B8D8-A94F230C87B4}"
@@ -8,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoConsole", "Examples\DemoConsole\DemoConsole.csproj", "{349C99BE-6A66-4AEC-B179-2BCCCA82D918}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketMonitor", "Examples\MarketMonitor\MarketMonitor.csproj", "{02FD6766-E9F6-468C-8AAE-71D09BF110F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppTest", "Examples\ConsoleAppTest\ConsoleAppTest.csproj", "{43B80E05-8D1D-42FD-A29D-E011DC073BC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,8 +63,23 @@ Global
 		{02FD6766-E9F6-468C-8AAE-71D09BF110F3}.Release|Mixed Platforms.Build.0 = Release|x86
 		{02FD6766-E9F6-468C-8AAE-71D09BF110F3}.Release|x86.ActiveCfg = Release|x86
 		{02FD6766-E9F6-468C-8AAE-71D09BF110F3}.Release|x86.Build.0 = Release|x86
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Debug|x86.Build.0 = Debug|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|x86.ActiveCfg = Release|Any CPU
+		{43B80E05-8D1D-42FD-A29D-E011DC073BC1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A6039E6-B981-4032-B3E9-84D6123EA134}
 	EndGlobalSection
 EndGlobal
