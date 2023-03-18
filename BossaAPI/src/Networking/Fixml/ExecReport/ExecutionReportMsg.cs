@@ -152,8 +152,8 @@ namespace pjank.BossaAPI.Fixml
 				order.StatusReport = new OrderStatusData();
 				order.StatusReport.Status = ExecReport_GetStatus();
 				order.StatusReport.Quantity = (uint)CumulatedQuantity;
-				order.StatusReport.NetValue = (decimal)NetMoney;
-				order.StatusReport.Commission = (decimal)CommissionValue;  // czasem == 0, ale dlaczego!? kto to wie... 
+				order.StatusReport.NetValue = NetMoney.HasValue ? NetMoney.Value : 0;
+				order.StatusReport.Commission = CommissionValue.HasValue ? CommissionValue.Value : 0;  // czasem == 0, ale dlaczego!? kto to wie... 
 
 				// pozostałe dane - żeby się nie rozdrabniać - też aktualizujemy za każdym razem
 				// (teoretycznie wystarczyłoby przy "new" i "replace"... ale czasem jako pierwsze
