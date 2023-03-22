@@ -102,7 +102,7 @@
             Rachunek, na którym złożono to zlecenie.
             </summary>
         </member>
-        <member name="P:pjank.BossaAPI.BosOrder.Id">
+        <member name="P:pjank.BossaAPI.BosOrder.Number">
             <summary>
             Identyfikator (numer) zlecenia nadany przez Dom Maklerski.
             Jeśli to nowe, wysyłane stąd zlecenie - null, dopóki nie zostanie przyjęte w DM.

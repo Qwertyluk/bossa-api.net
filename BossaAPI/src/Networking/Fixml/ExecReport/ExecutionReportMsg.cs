@@ -1,8 +1,8 @@
-﻿using System;
+﻿using pjank.BossaAPI.DTO;
+using System;
 using System.Net.Sockets;
 using System.Text;
 using System.Xml;
-using pjank.BossaAPI.DTO;
 
 namespace pjank.BossaAPI.Fixml
 {
@@ -11,7 +11,7 @@ namespace pjank.BossaAPI.Fixml
 		public const string MsgName = "ExecRpt";
 
 		public string BrokerOrderId { get; private set; }           // id zlecenia z DM, *nie* występuje w potw. transakcji
-		public string BrokerOrderId2 { get; private set; }          // nr zlecenia, obecny zawsze (przynajmniej docelowo)
+		public string BrokerOrderNumber { get; private set; }          // nr zlecenia, obecny zawsze (przynajmniej docelowo)
 		public string ClientOrderId { get; private set; }           // id zlecenia nadawane przez nas
 		public string StatusReqId { get; private set; }             // id zapytania o status zlecenia (OrderStatusRequest)
 		public string ExecId { get; private set; }                  // id wykonania zlecenia
@@ -52,7 +52,7 @@ namespace pjank.BossaAPI.Fixml
 		{
 			base.ParseXmlMessage(MsgName);
 			BrokerOrderId = FixmlUtil.ReadString(xml, "OrdID", true);
-			BrokerOrderId2 = FixmlUtil.ReadString(xml, "OrdID2", true);
+			BrokerOrderNumber = FixmlUtil.ReadString(xml, "OrdID2", true);
 			ClientOrderId = FixmlUtil.ReadString(xml, "ID", true);
 			StatusReqId = FixmlUtil.ReadString(xml, "StatReqID", true);
 			ExecId = FixmlUtil.ReadString(xml, "ExecID");
@@ -118,11 +118,12 @@ namespace pjank.BossaAPI.Fixml
 		}
 
 		public OrderData GetOrderDate()
-        {
+		{
 			var order = new OrderData();
 			order.AccountNumber = Account;
-			order.BrokerId = BrokerOrderId2;
+			order.BrokerOrderNumber = BrokerOrderNumber;
 			order.ClientId = ClientOrderId;
+			order.BrokerOrderId = BrokerOrderId;
 
 			// UWAGA: odczyt danych z komunikatu ExecRpt odbywa się "na czuja"... bo dostarczoną 
 			// z Bossy/Comarchu dokumentacją na ten temat to można sobie najwyżej w kominku podpalić.
@@ -214,7 +215,7 @@ namespace pjank.BossaAPI.Fixml
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format("[{0}:{1}:{2}] {3:T}", Xml.Name, BrokerOrderId2, ClientOrderId, TransactionTime));
+			sb.Append(string.Format("[{0}:{1}:{2}] {3:T}", Xml.Name, BrokerOrderNumber, ClientOrderId, TransactionTime));
 			sb.Append(string.Format("  {0}  {1,-4} {2} x {3,-7}", Instrument, Side, Quantity, PriceStr));
 			if (StopPrice != null) sb.Append(string.Format(" @{0}", StopPrice));
 			if (Status != null) sb.Append(string.Format("  {0}", Status));

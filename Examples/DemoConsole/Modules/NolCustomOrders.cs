@@ -60,7 +60,7 @@ namespace pjank.BossaAPI.DemoConsole.Modules
 					if (Console.ReadKey(true).Key == ConsoleKey.Escape) return;
 
 					var replaceRequest = new OrderReplaceRequestMsg();
-					replaceRequest.BrokerOrderId2 = execReport.BrokerOrderId2;
+					replaceRequest.BrokerOrderId2 = execReport.BrokerOrderNumber;
 					replaceRequest.Account = accountNumber;
 					replaceRequest.Side = OrderSide.Buy;
 					replaceRequest.Instrument = newRequest.Instrument;
@@ -80,7 +80,7 @@ namespace pjank.BossaAPI.DemoConsole.Modules
 					if (Console.ReadKey(true).Key == ConsoleKey.Escape) return;
 
 					var cancelRequest = new OrderCancelRequestMsg();
-					cancelRequest.BrokerOrderId2 = replaceRequest.BrokerOrderId2;
+					cancelRequest.BrokerOrderNumber = replaceRequest.BrokerOrderId2;
 					cancelRequest.Account = accountNumber;
 					cancelRequest.Side = newRequest.Side;
 					cancelRequest.Instrument = newRequest.Instrument;

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Xml;
 using System.Text;
+using System.Xml;
 
 namespace pjank.BossaAPI.Fixml
 {
@@ -11,7 +11,7 @@ namespace pjank.BossaAPI.Fixml
 		public string OrderCancelId;        // ID anulaty, definiowane przez nas
 		public string ClientOrderId;        // ID zlecenia do anulowania, nadane przez nas
 		public string BrokerOrderId;        // główne id zlecenia nadane w DM
-		public string BrokerOrderId2;       // numer zlecenia nadany w DM
+		public string BrokerOrderNumber;       // numer zlecenia nadany w DM
 		public string Account;              // numer rachunku
 		public FixmlInstrument Instrument;  // nazwa papieru
 		public OrderSide? Side;             // rodzaj zlecenia: kupno/sprzedaż
@@ -31,7 +31,7 @@ namespace pjank.BossaAPI.Fixml
 			xml.SetAttribute("ID", OrderCancelId);
 			if (ClientOrderId != null) xml.SetAttribute("OrigID", ClientOrderId);
 			if (BrokerOrderId != null) xml.SetAttribute("OrdID", BrokerOrderId);
-			if (BrokerOrderId2 != null) xml.SetAttribute("OrdID2", BrokerOrderId2);
+			if (BrokerOrderNumber != null) xml.SetAttribute("OrdID2", BrokerOrderNumber);
 			if (Account != null) xml.SetAttribute("Acct", Account);
 			if (Instrument != null) Instrument.Write(xmlDoc, xml, "Instrmt");
 			if (Side != null) xml.SetAttribute("Side", OrderSideUtil.Write(Side));

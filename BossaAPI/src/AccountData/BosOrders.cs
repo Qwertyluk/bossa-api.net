@@ -60,7 +60,7 @@ namespace pjank.BossaAPI
 		// aktualizacja danych na liście po odebraniu ich z sieci
 		internal void Update(DTO.OrderData data)
 		{
-			var order = list.Where(o => o.Id == data.BrokerId).SingleOrDefault();
+			var order = list.Where(o => o.Number == data.BrokerOrderNumber).SingleOrDefault();
 			if (order != null)
 				order.Update(data);
 			else 

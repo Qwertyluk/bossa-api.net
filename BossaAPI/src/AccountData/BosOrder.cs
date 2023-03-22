@@ -1,8 +1,8 @@
-﻿using System;
+﻿using pjank.BossaAPI.DTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using pjank.BossaAPI.DTO;
 
 namespace pjank.BossaAPI
 {
@@ -22,7 +22,10 @@ namespace pjank.BossaAPI
 		/// Identyfikator (numer) zlecenia nadany przez Dom Maklerski.
 		/// Jeśli to nowe, wysyłane stąd zlecenie - null, dopóki nie zostanie przyjęte w DM.
 		/// </summary>
+		public string Number { get; private set; }
+
 		public string Id { get; private set; }
+
 		/// <summary>
 		/// Data/godzina utworzenia zlecenia.
 		/// </summary>
@@ -105,7 +108,8 @@ namespace pjank.BossaAPI
 		internal BosOrder(BosAccount account, OrderData data)
 		{
 			Account = account;
-			Id = data.BrokerId;
+			Number = data.BrokerOrderNumber;
+			Id = data.BrokerOrderId;
 			Update(data);
 		}
 
@@ -151,7 +155,8 @@ namespace pjank.BossaAPI
 		{
 			var data = new OrderData();
 			data.AccountNumber = Account.Number;
-			data.BrokerId = Id;
+			data.BrokerOrderNumber = Number;
+			data.BrokerOrderId = Id;
 			data.MainData = new OrderMainData();
 			data.MainData.CreateTime = CreateTime;
 			data.MainData.Instrument = Instrument.Convert();
@@ -236,7 +241,7 @@ namespace pjank.BossaAPI
 		/// <param name="immediateOrCancel">Czy to zlecenie typu "WiA" (to, co nie wykona się natychmiast, jest od razu anulowane).</param>
 		/// <param name="expirationDate">Data ważności zlecenia (null, jeśli tylko na bieżącą sesję).</param>
 		/// <param name="tradeDate">Data sesji, na którą składamy zlecenie</param>
-		public static BosOrder Create(BosAccount account, BosInstrument instrument, 
+		public static BosOrder Create(BosAccount account, BosInstrument instrument,
 			BosOrderSide side, BosPrice price, decimal? activationPrice,
 			uint quantity, uint? minimumQuantity, uint? visibleQuantity, bool immediateOrCancel, DateTime? expirationDate, DateTime? tradeDate)
 		{

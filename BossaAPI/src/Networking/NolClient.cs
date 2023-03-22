@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using pjank.BossaAPI.DTO;
+using pjank.BossaAPI.Fixml;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
-using System.Threading;
-using Microsoft.Win32;
-using pjank.BossaAPI.Fixml;
-using pjank.BossaAPI.DTO;
 using System.Reflection;
+using System.Threading;
 
 namespace pjank.BossaAPI
 {
@@ -289,7 +289,7 @@ namespace pjank.BossaAPI
 						MyUtil.PrintWarning("NOL says: We're already logged in !?");
 					else
 						if (response.Status != UserStatus.LoggedIn)
-							throw new FixmlErrorMsgException(response);
+						throw new FixmlErrorMsgException(response);
 				}
 				catch (BizMessageRejectException e)
 				{
@@ -350,7 +350,7 @@ namespace pjank.BossaAPI
 		private uint? mdReqId = null;
 		private HashSet<MDEntryType> mdEntryTypes = new HashSet<MDEntryType>();
 		private HashSet<FixmlInstrument> mdInstruments = new HashSet<FixmlInstrument>();
-		private Dictionary<FixmlInstrument, MDResults> mdResults = new Dictionary<FixmlInstrument, MDResults>();
+		private readonly Dictionary<FixmlInstrument, MDResults> mdResults = new Dictionary<FixmlInstrument, MDResults>();
 
 		/// <summary>
 		/// Aktywacja odbioru (subskrypcji) informacji o bieżących notowaniach giełdowych.
@@ -749,7 +749,7 @@ namespace pjank.BossaAPI
 			{
 				OrderReplaceRequestMsg request = new OrderReplaceRequestMsg();
 				request.Account = data.AccountNumber;
-				request.BrokerOrderId2 = data.BrokerId;
+				request.BrokerOrderId2 = data.BrokerOrderNumber;
 				request.Instrument = FixmlInstrument.Find(data.MainData.Instrument);
 				request.Side = (data.MainData.Side == BosOrderSide.Buy) ? OrderSide.Buy : OrderSide.Sell;
 				request.Type = Order_GetType(data.MainData);
@@ -774,7 +774,8 @@ namespace pjank.BossaAPI
 			{
 				OrderCancelRequestMsg request = new OrderCancelRequestMsg();
 				request.Account = data.AccountNumber;
-				request.BrokerOrderId2 = data.BrokerId;
+				request.BrokerOrderNumber = data.BrokerOrderNumber;
+				request.BrokerOrderId = data.BrokerOrderId;
 				request.Instrument = FixmlInstrument.Find(data.MainData.Instrument);
 				request.Side = (data.MainData.Side == BosOrderSide.Buy) ? OrderSide.Buy : OrderSide.Sell;
 				request.Quantity = data.MainData.Quantity;
@@ -835,7 +836,8 @@ namespace pjank.BossaAPI
 					account.Number = statement.AccountNumber;
 					// otwarte pozycje...
 					account.Papers = statement.Positions.
-						Select(p => new Paper {
+						Select(p => new Paper
+						{
 							Instrument = p.Key.Convert(),
 							Account110 = p.Value.Acc110,
 							Account120 = p.Value.Acc120,
